@@ -9,6 +9,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -16,9 +17,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/server"
-	"trpc.group/trpc-go/trpc-a2a-go/taskmanager"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/server"
+	"github.com/mel2oo/a2a-go/taskmanager"
 )
 
 // simpleTaskProcessor implements the taskmanager.TaskProcessor interface.
@@ -43,7 +44,7 @@ func (p *simpleTaskProcessor) Process(
 			[]protocol.Part{protocol.NewTextPart(errMsg)},
 		)
 		_ = handle.UpdateStatus(protocol.TaskStateFailed, &failedMessage)
-		return fmt.Errorf(errMsg)
+		return errors.New(errMsg)
 	}
 
 	log.Printf("Processing task %s with input: %s", taskID, text)
@@ -64,11 +65,11 @@ func (p *simpleTaskProcessor) Process(
 
 	// Add the processed text as an artifact.
 	artifact := protocol.Artifact{
-		Name:        stringPtr("Reversed Text"),
-		Description: stringPtr("The input text reversed"),
+		Name:        "Reversed Text",
+		Description: "The input text reversed",
 		Index:       0,
 		Parts:       []protocol.Part{protocol.NewTextPart(result)},
-		LastChunk:   boolPtr(true),
+		LastChunk:   true,
 	}
 
 	if err := handle.AddArtifact(artifact); err != nil {
@@ -97,16 +98,6 @@ func reverseString(s string) string {
 	return string(runes)
 }
 
-// Helper function to create string pointers.
-func stringPtr(s string) *string {
-	return &s
-}
-
-// Helper function to create bool pointers.
-func boolPtr(b bool) *bool {
-	return &b
-}
-
 func main() {
 	// Parse command-line flags.
 	host := flag.String("host", "localhost", "Host to listen on")
@@ -116,7 +107,7 @@ func main() {
 	// Create the agent card.
 	agentCard := server.AgentCard{
 		Name:        "Simple A2A Example Server",
-		Description: stringPtr("A simple example A2A server that reverses text"),
+		Description: "A simple example A2A server that reverses text",
 		URL:         fmt.Sprintf("http://%s:%d/", *host, *port),
 		Version:     "1.0.0",
 		Provider: &server.AgentProvider{
@@ -132,7 +123,7 @@ func main() {
 			{
 				ID:          "text_reversal",
 				Name:        "Text Reversal",
-				Description: stringPtr("Reverses the input text"),
+				Description: "Reverses the input text",
 				Tags:        []string{"text", "processing"},
 				Examples:    []string{"Hello, world!"},
 				InputModes:  []string{string(protocol.PartTypeText)},

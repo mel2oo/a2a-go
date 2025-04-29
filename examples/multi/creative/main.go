@@ -9,12 +9,12 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/mel2oo/a2a-go/log"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/server"
+	"github.com/mel2oo/a2a-go/taskmanager"
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/googleai"
-	"trpc.group/trpc-go/trpc-a2a-go/log"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/server"
-	"trpc.group/trpc-go/trpc-a2a-go/taskmanager"
 )
 
 // conversationCache to store conversation histories
@@ -165,11 +165,11 @@ func (p *creativeWritingProcessor) Process(
 
 	// Add response as an artifact
 	artifact := protocol.Artifact{
-		Name:        stringPtr("Creative Writing Response"),
-		Description: stringPtr(prompt),
+		Name:        "Creative Writing Response",
+		Description: prompt,
 		Index:       0,
 		Parts:       []protocol.Part{protocol.NewTextPart(response)},
-		LastChunk:   boolPtr(true),
+		LastChunk:   true,
 	}
 
 	if err := handle.AddArtifact(artifact); err != nil {
@@ -189,20 +189,11 @@ func extractText(message protocol.Message) string {
 	return ""
 }
 
-// Helper functions
-func stringPtr(s string) *string {
-	return &s
-}
-
-func boolPtr(b bool) *bool {
-	return &b
-}
-
 // getAgentCard returns the agent's metadata
 func getAgentCard() server.AgentCard {
 	return server.AgentCard{
 		Name:        "Creative Writing Agent",
-		Description: stringPtr("An agent that generates creative writing based on prompts using Google Gemini."),
+		Description: "An agent that generates creative writing based on prompts using Google Gemini.",
 		URL:         "http://localhost:8082",
 		Version:     "1.0.0",
 		Capabilities: server.AgentCapabilities{
@@ -216,7 +207,7 @@ func getAgentCard() server.AgentCard {
 			{
 				ID:          "creative_writing",
 				Name:        "Creative Writing",
-				Description: stringPtr("Creates engaging creative text based on user prompts."),
+				Description: "Creates engaging creative text based on user prompts.",
 				Examples: []string{
 					"Write a short story about a space explorer",
 					"Compose a poem about autumn leaves",

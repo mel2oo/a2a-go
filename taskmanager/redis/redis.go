@@ -17,10 +17,10 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"trpc.group/trpc-go/trpc-a2a-go/auth"
-	"trpc.group/trpc-go/trpc-a2a-go/log"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/taskmanager"
+	"github.com/mel2oo/a2a-go/auth"
+	"github.com/mel2oo/a2a-go/log"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/taskmanager"
 )
 
 const (

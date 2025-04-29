@@ -22,11 +22,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"trpc.group/trpc-go/trpc-a2a-go/auth"
-	"trpc.group/trpc-go/trpc-a2a-go/internal/jsonrpc"
-	"trpc.group/trpc-go/trpc-a2a-go/internal/sse"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/taskmanager"
+	"github.com/mel2oo/a2a-go/auth"
+	"github.com/mel2oo/a2a-go/internal/jsonrpc"
+	"github.com/mel2oo/a2a-go/internal/sse"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/taskmanager"
 )
 
 // Helper to create a default AgentCard for tests.
@@ -35,7 +35,7 @@ func defaultAgentCard() AgentCard {
 	desc := "Agent used for server testing."
 	return AgentCard{
 		Name:        "Test Agent",
-		Description: &desc,
+		Description: desc,
 		URL:         "http://localhost/test-agent", // Example URL
 		Version:     "test-agent-v0.1.0",
 		Capabilities: AgentCapabilities{

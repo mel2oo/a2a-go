@@ -17,10 +17,10 @@ import (
 
 	"github.com/google/uuid"
 
-	"trpc.group/trpc-go/trpc-a2a-go/client"
-	"trpc.group/trpc-go/trpc-a2a-go/log"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/server"
+	"github.com/mel2oo/a2a-go/client"
+	"github.com/mel2oo/a2a-go/log"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/server"
 )
 
 func main() {
@@ -207,8 +207,8 @@ func processStreamEvents(ctx context.Context, streamChan <-chan protocol.TaskEve
 
 // getArtifactName returns the name of an artifact or a default if name is nil
 func getArtifactName(artifact protocol.Artifact) string {
-	if artifact.Name != nil {
-		return *artifact.Name
+	if artifact.Name != "" {
+		return artifact.Name
 	}
 	return fmt.Sprintf("Unnamed artifact (index: %d)", artifact.Index)
 }

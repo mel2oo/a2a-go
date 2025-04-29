@@ -22,20 +22,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"trpc.group/trpc-go/trpc-a2a-go/auth"
-	"trpc.group/trpc-go/trpc-a2a-go/internal/jsonrpc"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/taskmanager"
+	"github.com/mel2oo/a2a-go/auth"
+	"github.com/mel2oo/a2a-go/internal/jsonrpc"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/taskmanager"
 )
-
-// Helper functions for testing
-func stringPtr(s string) *string {
-	return &s
-}
-
-func boolPtr(b bool) *bool {
-	return &b
-}
 
 // setupTestServer creates a test server with the given task manager and options.
 // Returns the test server and the A2A server for use in tests.
@@ -536,8 +527,8 @@ func TestA2AServer_HandleTasksSendSubscribe(t *testing.T) {
 		artifactUpdate := protocol.TaskArtifactUpdateEvent{
 			ID: "test-sub-task",
 			Artifact: protocol.Artifact{
-				Name:      stringPtr("test-artifact"),
-				LastChunk: boolPtr(true),
+				Name:      "test-artifact",
+				LastChunk: true,
 				Parts:     []protocol.Part{protocol.NewTextPart("Artifact content")},
 			},
 			Final: false,

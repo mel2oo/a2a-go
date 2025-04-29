@@ -17,10 +17,10 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/server"
-	"trpc.group/trpc-go/trpc-a2a-go/taskmanager"
-	redismgr "trpc.group/trpc-go/trpc-a2a-go/taskmanager/redis"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/server"
+	"github.com/mel2oo/a2a-go/taskmanager"
+	redismgr "github.com/mel2oo/a2a-go/taskmanager/redis"
 )
 
 // DemoTaskProcessor implements TaskProcessor for our demo server.
@@ -65,7 +65,7 @@ func (p *DemoTaskProcessor) Process(
 
 	// Add an artifact
 	artifact := protocol.Artifact{
-		Name:  strPtr("result"),
+		Name:  "result",
 		Parts: []protocol.Part{protocol.NewTextPart(response)},
 		Index: 0,
 	}
@@ -88,11 +88,6 @@ func (p *DemoTaskProcessor) Process(
 	}
 
 	return nil
-}
-
-// Helper function to create string pointers
-func strPtr(s string) *string {
-	return &s
 }
 
 func main() {
@@ -133,7 +128,7 @@ func main() {
 
 	agentCard := server.AgentCard{
 		Name:        "Redis Task Manager Demo",
-		Description: &description,
+		Description: description,
 		URL:         serverURL,
 		Version:     version,
 		Capabilities: server.AgentCapabilities{

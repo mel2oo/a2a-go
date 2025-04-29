@@ -8,17 +8,18 @@ package taskmanager
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"testing"
 	"time"
 
-	// "trpc.group/trpc-go/trpc-a2a-go/internal/jsonrpc" // Removed unused import
+	// "github.com/mel2oo/a2a-go/internal/jsonrpc" // Removed unused import
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"trpc.group/trpc-go/trpc-a2a-go/internal/jsonrpc"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/internal/jsonrpc"
+	"github.com/mel2oo/a2a-go/protocol"
 )
 
 // mockProcessor is a simple TaskProcessor for testing.
@@ -332,7 +333,7 @@ func TestMemTaskMgr_OnSendTaskSub_Error(t *testing.T) {
 			}
 
 			// Return error to simulate failure
-			return fmt.Errorf(errMsg)
+			return errors.New(errMsg)
 		},
 	}
 	tm, err := NewMemoryTaskManager(processor)
@@ -661,7 +662,7 @@ func TestMemTaskManagerPushNotif(t *testing.T) {
 			Token: "test-token",
 			Authentication: &protocol.AuthenticationInfo{
 				Schemes:     []string{"Bearer"},
-				Credentials: stringPtr("Bearer test-token"),
+				Credentials: "Bearer test-token",
 			},
 			Metadata: map[string]interface{}{
 				"priority": "high",
@@ -679,7 +680,7 @@ func TestMemTaskManagerPushNotif(t *testing.T) {
 	require.NotNil(t, resultConfig.PushNotificationConfig.Authentication)
 	assert.Equal(t, []string{"Bearer"}, resultConfig.PushNotificationConfig.Authentication.Schemes)
 	require.NotNil(t, resultConfig.PushNotificationConfig.Authentication.Credentials)
-	assert.Equal(t, "Bearer test-token", *resultConfig.PushNotificationConfig.Authentication.Credentials)
+	assert.Equal(t, "Bearer test-token", resultConfig.PushNotificationConfig.Authentication.Credentials)
 	assert.Equal(t, "high", resultConfig.PushNotificationConfig.Metadata["priority"])
 
 	// Test OnPushNotificationGet
@@ -693,7 +694,7 @@ func TestMemTaskManagerPushNotif(t *testing.T) {
 	require.NotNil(t, fetchedConfig.PushNotificationConfig.Authentication)
 	assert.Equal(t, []string{"Bearer"}, fetchedConfig.PushNotificationConfig.Authentication.Schemes)
 	require.NotNil(t, fetchedConfig.PushNotificationConfig.Authentication.Credentials)
-	assert.Equal(t, "Bearer test-token", *fetchedConfig.PushNotificationConfig.Authentication.Credentials)
+	assert.Equal(t, "Bearer test-token", fetchedConfig.PushNotificationConfig.Authentication.Credentials)
 	require.NotNil(t, fetchedConfig.PushNotificationConfig.Metadata)
 	assert.Equal(t, "high", fetchedConfig.PushNotificationConfig.Metadata["priority"])
 
@@ -739,7 +740,7 @@ func TestMemTaskManagerPushNotif(t *testing.T) {
 			Token: "updated-token",
 			Authentication: &protocol.AuthenticationInfo{
 				Schemes:     []string{"Bearer"},
-				Credentials: stringPtr("Bearer updated-token"),
+				Credentials: "Bearer updated-token",
 			},
 		},
 	}
@@ -751,7 +752,7 @@ func TestMemTaskManagerPushNotif(t *testing.T) {
 	require.NotNil(t, updatedResult.PushNotificationConfig.Authentication)
 	assert.Equal(t, []string{"Bearer"}, updatedResult.PushNotificationConfig.Authentication.Schemes)
 	require.NotNil(t, updatedResult.PushNotificationConfig.Authentication.Credentials)
-	assert.Equal(t, "Bearer updated-token", *updatedResult.PushNotificationConfig.Authentication.Credentials)
+	assert.Equal(t, "Bearer updated-token", updatedResult.PushNotificationConfig.Authentication.Credentials)
 
 	// Fetch again to verify update
 	fetchedUpdatedConfig, err := tm.OnPushNotificationGet(context.Background(), getParams)
@@ -761,7 +762,7 @@ func TestMemTaskManagerPushNotif(t *testing.T) {
 	require.NotNil(t, fetchedUpdatedConfig.PushNotificationConfig.Authentication)
 	assert.Equal(t, []string{"Bearer"}, fetchedUpdatedConfig.PushNotificationConfig.Authentication.Schemes)
 	require.NotNil(t, fetchedUpdatedConfig.PushNotificationConfig.Authentication.Credentials)
-	assert.Equal(t, "Bearer updated-token", *fetchedUpdatedConfig.PushNotificationConfig.Authentication.Credentials)
+	assert.Equal(t, "Bearer updated-token", fetchedUpdatedConfig.PushNotificationConfig.Authentication.Credentials)
 }
 
 func TestMemoryTaskManager_OnResubscribe(t *testing.T) {
@@ -889,11 +890,6 @@ func TestMemoryTaskManager_OnResubscribe(t *testing.T) {
 	assert.True(t, completedStatusEvent.Final)
 }
 
-// Helper function to create string pointers
-func stringPtr(s string) *string {
-	return &s
-}
-
 // TestAddArtifact tests the AddArtifact method of TaskHandle and MemoryTaskManager
 func TestAddArtifact(t *testing.T) {
 	processor := &mockProcessor{}
@@ -903,39 +899,34 @@ func TestAddArtifact(t *testing.T) {
 	taskID := "test-artifact-task"
 	params := createTestTask(taskID, "Test with artifacts")
 
-	// Helper function to create bool pointers
-	boolPtr := func(b bool) *bool {
-		return &b
-	}
-
 	// Create a task and get its handle
 	processor.processFunc = func(ctx context.Context, taskID string, msg protocol.Message, handle TaskHandle) error {
 		// Test adding an artifact to the task
 		textPart := protocol.NewTextPart("Artifact content")
 		err := handle.AddArtifact(protocol.Artifact{
-			Name:        stringPtr("test-artifact"),
-			Description: stringPtr("A test artifact"),
+			Name:        "test-artifact",
+			Description: "A test artifact",
 			Parts:       []protocol.Part{textPart},
-			LastChunk:   boolPtr(true),
+			LastChunk:   true,
 		})
 		assert.NoError(t, err, "Adding artifact should succeed")
 
 		// Test adding a streaming artifact (multiple chunks)
 		firstChunkPart := protocol.NewTextPart("First chunk")
 		err = handle.AddArtifact(protocol.Artifact{
-			Name:        stringPtr("streaming-artifact"),
-			Description: stringPtr("A streaming artifact"),
+			Name:        "streaming-artifact",
+			Description: "A streaming artifact",
 			Parts:       []protocol.Part{firstChunkPart},
-			LastChunk:   boolPtr(false),
+			LastChunk:   false,
 		})
 		assert.NoError(t, err, "Adding first chunk should succeed")
 
 		lastChunkPart := protocol.NewTextPart("Last chunk")
 		err = handle.AddArtifact(protocol.Artifact{
-			Name:        stringPtr("streaming-artifact"),
-			Description: stringPtr("A streaming artifact"),
+			Name:        "streaming-artifact",
+			Description: "A streaming artifact",
 			Parts:       []protocol.Part{lastChunkPart},
-			LastChunk:   boolPtr(true),
+			LastChunk:   true,
 		})
 		assert.NoError(t, err, "Adding last chunk should succeed")
 
@@ -952,23 +943,23 @@ func TestAddArtifact(t *testing.T) {
 	require.Len(t, task.Artifacts, 3, "Task should have 3 artifacts")
 
 	// Verify first artifact
-	assert.Equal(t, "test-artifact", *task.Artifacts[0].Name)
-	assert.Equal(t, "A test artifact", *task.Artifacts[0].Description)
-	assert.True(t, *task.Artifacts[0].LastChunk)
+	assert.Equal(t, "test-artifact", task.Artifacts[0].Name)
+	assert.Equal(t, "A test artifact", task.Artifacts[0].Description)
+	assert.True(t, task.Artifacts[0].LastChunk)
 	require.Len(t, task.Artifacts[0].Parts, 1)
 	textPart, ok := task.Artifacts[0].Parts[0].(protocol.TextPart)
 	require.True(t, ok)
 	assert.Equal(t, "Artifact content", textPart.Text)
 
 	// Verify first streaming chunk
-	assert.Equal(t, "streaming-artifact", *task.Artifacts[1].Name)
-	assert.Equal(t, "A streaming artifact", *task.Artifacts[1].Description)
-	assert.False(t, *task.Artifacts[1].LastChunk)
+	assert.Equal(t, "streaming-artifact", task.Artifacts[1].Name)
+	assert.Equal(t, "A streaming artifact", task.Artifacts[1].Description)
+	assert.False(t, task.Artifacts[1].LastChunk)
 
 	// Verify last streaming chunk
-	assert.Equal(t, "streaming-artifact", *task.Artifacts[2].Name)
-	assert.Equal(t, "A streaming artifact", *task.Artifacts[2].Description)
-	assert.True(t, *task.Artifacts[2].LastChunk)
+	assert.Equal(t, "streaming-artifact", task.Artifacts[2].Name)
+	assert.Equal(t, "A streaming artifact", task.Artifacts[2].Description)
+	assert.True(t, task.Artifacts[2].LastChunk)
 	require.Len(t, task.Artifacts[2].Parts, 1)
 	textPart, ok = task.Artifacts[2].Parts[0].(protocol.TextPart)
 	require.True(t, ok)
@@ -988,9 +979,9 @@ func TestAddArtifact(t *testing.T) {
 	}
 
 	err = handle.AddArtifact(protocol.Artifact{
-		Name:      stringPtr("test-artifact"),
+		Name:      "test-artifact",
 		Parts:     []protocol.Part{protocol.NewTextPart("Test content")},
-		LastChunk: boolPtr(true),
+		LastChunk: true,
 	})
 	assert.Error(t, err, "Adding artifact to non-existent task should fail")
 	assert.Contains(t, err.Error(), "not found", "Error should indicate task not found")

@@ -15,8 +15,8 @@ import (
 	"sync"
 	"time"
 
-	"trpc.group/trpc-go/trpc-a2a-go/log"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/log"
+	"github.com/mel2oo/a2a-go/protocol"
 )
 
 // MemoryTaskManager provides a concrete, memory-based implementation of the
@@ -363,11 +363,10 @@ func (m *MemoryTaskManager) AddArtifact(taskID string, artifact protocol.Artifac
 	// Create copies for notification before unlocking.
 	m.TasksMutex.Unlock() // Unlock before potentially blocking on channel send.
 	// Notify subscribers outside the lock.
-	finalEvent := artifact.LastChunk != nil && *artifact.LastChunk
 	m.notifySubscribers(taskID, protocol.TaskArtifactUpdateEvent{
 		ID:       taskID,
 		Artifact: artifact,
-		Final:    finalEvent,
+		Final:    artifact.LastChunk,
 	})
 	return nil
 }

@@ -9,7 +9,7 @@ package taskmanager
 import (
 	"context"
 
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/protocol"
 )
 
 // memoryTaskHandle implements the TaskHandle interface, providing callbacks

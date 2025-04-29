@@ -12,12 +12,12 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/mel2oo/a2a-go/log"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/server"
+	"github.com/mel2oo/a2a-go/taskmanager"
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/googleai"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/log"
-	"trpc.group/trpc-go/trpc-a2a-go/server"
-	"trpc.group/trpc-go/trpc-a2a-go/taskmanager"
 )
 
 // exchangeProcessor implements the taskmanager.TaskProcessor interface.
@@ -163,11 +163,11 @@ func (p *exchangeProcessor) Process(
 
 	// Add the exchange rate data as an artifact
 	artifact := protocol.Artifact{
-		Name:        stringPtr("Exchange Rate Data"),
-		Description: stringPtr(fmt.Sprintf("Exchange rate from %s to %s", fromCurrency, toCurrency)),
+		Name:        "Exchange Rate Data",
+		Description: fmt.Sprintf("Exchange rate from %s to %s", fromCurrency, toCurrency),
 		Index:       0,
 		Parts:       []protocol.Part{protocol.NewTextPart(result)},
-		LastChunk:   boolPtr(true),
+		LastChunk:   true,
 	}
 
 	if err := handle.AddArtifact(artifact); err != nil {
@@ -285,20 +285,11 @@ func extractText(message protocol.Message) string {
 	return ""
 }
 
-// Helper functions
-func stringPtr(s string) *string {
-	return &s
-}
-
-func boolPtr(b bool) *bool {
-	return &b
-}
-
 // getAgentCard returns the agent's metadata.
 func getAgentCard() server.AgentCard {
 	return server.AgentCard{
 		Name:        "Currency Exchange Agent",
-		Description: stringPtr("An agent that can fetch and display currency exchange rates."),
+		Description: "An agent that can fetch and display currency exchange rates.",
 		URL:         "http://localhost:8081",
 		Version:     "1.0.0",
 		Capabilities: server.AgentCapabilities{
@@ -312,7 +303,7 @@ func getAgentCard() server.AgentCard {
 			{
 				ID:          "exchange_rate",
 				Name:        "Currency Exchange Rates",
-				Description: stringPtr("Gets the current or historical exchange rates between currencies."),
+				Description: "Gets the current or historical exchange rates between currencies.",
 				Examples: []string{
 					"What is the exchange rate from USD to EUR?",
 					"Convert 100 USD to JPY",

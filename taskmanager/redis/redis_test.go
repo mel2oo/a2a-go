@@ -17,8 +17,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/taskmanager"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/taskmanager"
 )
 
 // testProcessor is a test implementation of the TaskProcessor interface
@@ -104,7 +104,7 @@ func (p *testProcessor) Process(
 	if command == "artifacts" {
 		for i := 0; i < 3; i++ {
 			artifact := protocol.Artifact{
-				Name: stringPtr(fmt.Sprintf("artifact-%d", i)),
+				Name: fmt.Sprintf("artifact-%d", i),
 				Parts: []protocol.Part{
 					protocol.NewTextPart(fmt.Sprintf("Artifact content %d: %s", i, messageText)),
 				},
@@ -132,10 +132,6 @@ func (p *testProcessor) Process(
 		Role:  protocol.MessageRoleAgent,
 		Parts: []protocol.Part{protocol.NewTextPart("Task completed successfully: " + messageText)},
 	})
-}
-
-func stringPtr(s string) *string {
-	return &s
 }
 
 // setupRedisTest creates an in-memory Redis server and returns a configured TaskManager

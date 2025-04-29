@@ -19,9 +19,9 @@ import (
 	"syscall"
 	"time"
 
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/server"
-	"trpc.group/trpc-go/trpc-a2a-go/taskmanager"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/server"
+	"github.com/mel2oo/a2a-go/taskmanager"
 )
 
 // streamingTaskProcessor implements the TaskProcessor interface for streaming responses.
@@ -108,12 +108,12 @@ func (p *streamingTaskProcessor) Process(
 		// Create an artifact for this chunk
 		isLastChunk := (i == totalChunks-1)
 		chunkArtifact := protocol.Artifact{
-			Name:        stringPtr(fmt.Sprintf("Chunk %d of %d", i+1, totalChunks)),
-			Description: stringPtr("Streaming chunk of processed data"),
+			Name:        fmt.Sprintf("Chunk %d of %d", i+1, totalChunks),
+			Description: "Streaming chunk of processed data",
 			Index:       i,
 			Parts:       []protocol.Part{protocol.NewTextPart(processedChunk)},
-			Append:      boolPtr(i > 0),       // Append after the first chunk
-			LastChunk:   boolPtr(isLastChunk), // Mark the last chunk
+			Append:      i > 0,       // Append after the first chunk
+			LastChunk:   isLastChunk, // Mark the last chunk
 		}
 
 		// Add the artifact
@@ -172,11 +172,11 @@ func (p *streamingTaskProcessor) processNonStreaming(
 
 	// Create a single artifact with the result
 	artifact := protocol.Artifact{
-		Name:        stringPtr("Processed Text"),
-		Description: stringPtr("Complete processed text"),
+		Name:        "Processed Text",
+		Description: "Complete processed text",
 		Index:       0,
 		Parts:       []protocol.Part{protocol.NewTextPart(processedText)},
-		LastChunk:   boolPtr(true),
+		LastChunk:   true,
 	}
 
 	// Add the artifact
@@ -354,7 +354,7 @@ func main() {
 	description := "A2A streaming example server that processes text in chunks"
 	agentCard := server.AgentCard{
 		Name:        "Streaming Text Processor",
-		Description: &description,
+		Description: description,
 		URL:         serverURL,
 		Version:     "1.0.0",
 		Provider: &server.AgentProvider{
@@ -370,7 +370,7 @@ func main() {
 			{
 				ID:          "streaming_processor",
 				Name:        "Streaming Text Processor",
-				Description: stringPtr("Input: Any text\nOutput: Chunks of reversed text delivered incrementally\n\nExample input: hello world\nOutput chunk 1: oll\nOutput chunk 2: eh\nOutput chunk 3: dlrow"),
+				Description: "Input: Any text\nOutput: Chunks of reversed text delivered incrementally\n\nExample input: hello world\nOutput chunk 1: oll\nOutput chunk 2: eh\nOutput chunk 3: dlrow",
 				Tags:        []string{"text", "stream", "example"},
 				Examples: []string{
 					"The quick brown fox jumps over the lazy dog",
@@ -423,13 +423,4 @@ func main() {
 	}
 
 	log.Println("Server shutdown complete")
-}
-
-// Helper functions to create pointers
-func stringPtr(s string) *string {
-	return &s
-}
-
-func boolPtr(b bool) *bool {
-	return &b
 }

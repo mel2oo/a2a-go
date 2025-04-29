@@ -15,8 +15,8 @@ import (
 	"strings"
 	"time"
 
-	"trpc.group/trpc-go/trpc-a2a-go/client"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/client"
+	"github.com/mel2oo/a2a-go/protocol"
 )
 
 // printTaskDetails prints the details of a task to the console.
@@ -67,8 +67,8 @@ func artifactToString(artifact protocol.Artifact) string {
 	}
 
 	name := "unnamed"
-	if artifact.Name != nil {
-		name = *artifact.Name
+	if artifact.Name != "" {
+		name = artifact.Name
 	}
 
 	lastChunk := false
@@ -252,8 +252,8 @@ func handleStatusUpdateEvent(event protocol.TaskStatusUpdateEvent) {
 // handleArtifactUpdateEvent processes an artifact update event.
 func handleArtifactUpdateEvent(event protocol.TaskArtifactUpdateEvent) {
 	name := "unnamed"
-	if event.Artifact.Name != nil {
-		name = *event.Artifact.Name
+	if event.Artifact.Name != "" {
+		name = event.Artifact.Name
 	}
 	log.Printf("Artifact: %s (Index: %d)", name, event.Artifact.Index)
 	log.Printf("  Content: %s", artifactToString(event.Artifact))

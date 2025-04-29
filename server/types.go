@@ -8,7 +8,7 @@
 package server
 
 import (
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/protocol"
 )
 
 // AgentCapabilities defines the capabilities supported by an agent.
@@ -28,7 +28,7 @@ type AgentSkill struct {
 	// Name is the human-readable name of the skill.
 	Name string `json:"name"`
 	// Description is an optional detailed description of the skill.
-	Description *string `json:"description,omitempty"`
+	Description string `json:"description,omitempty"`
 	// Tags are optional tags for categorization.
 	Tags []string `json:"tags,omitempty"`
 	// Examples are optional usage examples.
@@ -44,7 +44,7 @@ type AgentProvider struct {
 	// Organization is the name of the provider.
 	Organization string `json:"organization"`
 	// URL is an optional URL for the provider.
-	URL *string `json:"url,omitempty"`
+	URL string `json:"url,omitempty"`
 }
 
 // AgentAuthentication defines the authentication mechanism required by the agent.
@@ -63,7 +63,7 @@ type AgentCard struct {
 	// Name is the name of the agent.
 	Name string `json:"name"`
 	// Description is an optional description of the agent.
-	Description *string `json:"description,omitempty"`
+	Description string `json:"description,omitempty"`
 	// URL is the endpoint URL where the agent is hosted.
 	URL string `json:"url"`
 	// Provider is an optional provider information.
@@ -71,7 +71,7 @@ type AgentCard struct {
 	// Version is the agent version string.
 	Version string `json:"version"`
 	// DocumentationURL is an optional link to documentation.
-	DocumentationURL *string `json:"documentationUrl,omitempty"`
+	DocumentationURL string `json:"documentationUrl,omitempty"`
 	// Capabilities are the declared capabilities of the agent.
 	Capabilities AgentCapabilities `json:"capabilities"`
 	// Authentication is an optional authentication details.

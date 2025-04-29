@@ -12,12 +12,12 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/mel2oo/a2a-go/log"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/server"
+	"github.com/mel2oo/a2a-go/taskmanager"
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/googleai"
-	"trpc.group/trpc-go/trpc-a2a-go/log"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/server"
-	"trpc.group/trpc-go/trpc-a2a-go/taskmanager"
 )
 
 // Store request IDs for demonstration purposes
@@ -227,11 +227,11 @@ func (p *reimbursementProcessor) handleFormSubmission(
 
 	// Add the reimbursement data as an artifact
 	artifact := protocol.Artifact{
-		Name:        stringPtr("Reimbursement Request"),
-		Description: stringPtr(fmt.Sprintf("Reimbursement request for %s", amount)),
+		Name:        "Reimbursement Request",
+		Description: fmt.Sprintf("Reimbursement request for %s", amount),
 		Index:       0,
 		Parts:       []protocol.Part{protocol.NewTextPart(response)},
-		LastChunk:   boolPtr(true),
+		LastChunk:   true,
 	}
 
 	if err := handle.AddArtifact(artifact); err != nil {
@@ -349,20 +349,11 @@ func extractText(message protocol.Message) string {
 	return ""
 }
 
-// Helper functions
-func stringPtr(s string) *string {
-	return &s
-}
-
-func boolPtr(b bool) *bool {
-	return &b
-}
-
 // getAgentCard returns the agent's metadata
 func getAgentCard() server.AgentCard {
 	return server.AgentCard{
 		Name:        "Reimbursement Agent",
-		Description: stringPtr("An agent that processes employee reimbursement requests."),
+		Description: "An agent that processes employee reimbursement requests.",
 		URL:         "http://localhost:8083",
 		Version:     "1.0.0",
 		Capabilities: server.AgentCapabilities{
@@ -376,7 +367,7 @@ func getAgentCard() server.AgentCard {
 			{
 				ID:          "reimbursement",
 				Name:        "Process Reimbursements",
-				Description: stringPtr("Creates and processes expense reimbursement requests."),
+				Description: "Creates and processes expense reimbursement requests.",
 				Examples: []string{
 					"I need to get reimbursed for my business lunch.",
 					"Process my reimbursement for $50 for office supplies.",

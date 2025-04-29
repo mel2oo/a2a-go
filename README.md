@@ -1,6 +1,6 @@
 # tRPC-A2A-Go
 
-[![Go Reference](https://pkg.go.dev/badge/trpc.group/trpc-go/trpc-a2a-go.svg)](https://pkg.go.dev/trpc.group/trpc-go/trpc-a2a-go)
+[![Go Reference](https://pkg.go.dev/badge/github.com/mel2oo/a2a-go.svg)](https://pkg.go.dev/github.com/mel2oo/a2a-go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/trpc-group/trpc-a2a-go)](https://goreportcard.com/report/github.com/trpc-group/trpc-a2a-go)
 [![LICENSE](https://img.shields.io/badge/license-Apache--2.0-green.svg)](https://github.com/trpc-group/trpc-a2a-go/blob/main/LICENSE)
 [![Releases](https://img.shields.io/github/release/trpc-group/trpc-a2a-go.svg?style=flat-square)](https://github.com/trpc-group/trpc-a2a-go/releases)
@@ -156,8 +156,8 @@ This interface defines how your agent processes incoming tasks:
 import (
     "context"
 
-    "trpc.group/trpc-go/trpc-a2a-go/protocol"
-    "trpc.group/trpc-go/trpc-a2a-go/taskmanager"
+    "github.com/mel2oo/a2a-go/protocol"
+    "github.com/mel2oo/a2a-go/taskmanager"
 )
 
 // Implement the TaskProcessor interface
@@ -186,18 +186,13 @@ The agent card describes your agent's capabilities:
 
 ```go
 import (
-    "trpc.group/trpc-go/trpc-a2a-go/server"
-    "trpc.group/trpc-go/trpc-a2a-go/protocol"
+    "github.com/mel2oo/a2a-go/server"
+    "github.com/mel2oo/a2a-go/protocol"
 )
-
-// Helper function to create string pointers
-func stringPtr(s string) *string {
-    return &s
-}
 
 agentCard := server.AgentCard{
     Name: "My Agent",
-    Description: stringPtr("Agent description"),
+    Description: "Agent description",
     URL: "http://localhost:8080/",
     Version: "1.0.0",
     Provider: &server.AgentProvider{
@@ -213,7 +208,7 @@ agentCard := server.AgentCard{
         {
             ID: "my_skill",
             Name: "Skill name",
-            Description: stringPtr("Skill description"),
+            Description: "Skill description",
             Tags: []string{"tag1", "tag2"},
             Examples: []string{"Example input"},
             InputModes: []string{string(protocol.PartTypeText)},
@@ -231,8 +226,8 @@ Initialize the server with your task processor and agent card:
 import (
     "log"
 
-    "trpc.group/trpc-go/trpc-a2a-go/server"
-    "trpc.group/trpc-go/trpc-a2a-go/taskmanager"
+    "github.com/mel2oo/a2a-go/server"
+    "github.com/mel2oo/a2a-go/taskmanager"
 )
 
 // Create the task processor
@@ -279,8 +274,8 @@ The tRPC-A2A-Go framework supports multiple authentication methods for securing 
 import (
     "time"
     
-    "trpc.group/trpc-go/trpc-a2a-go/auth"
-    "trpc.group/trpc-go/trpc-a2a-go/server"
+    "github.com/mel2oo/a2a-go/auth"
+    "github.com/mel2oo/a2a-go/server"
 )
 
 // Create a JWT authentication provider
@@ -340,7 +335,7 @@ Create authenticated clients using the appropriate options:
 
 ```go
 import (
-    "trpc.group/trpc-go/trpc-a2a-go/client"
+    "github.com/mel2oo/a2a-go/client"
 )
 
 // JWT Authentication

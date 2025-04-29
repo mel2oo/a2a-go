@@ -15,11 +15,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Helper function to get a pointer to a boolean.
-func boolPtr(b bool) *bool {
-	return &b
-}
-
 // Test marshalling of concrete types
 func TestPartConcreteType_MarshalJSON(t *testing.T) {
 	t.Run("TextPart", func(t *testing.T) {
@@ -106,12 +101,12 @@ func TestTaskEvent_IsFinal(t *testing.T) {
 		},
 		{
 			name:     "ArtifactUpdate Not Last Chunk",
-			event:    TaskArtifactUpdateEvent{Final: false, Artifact: Artifact{LastChunk: boolPtr(false)}},
+			event:    TaskArtifactUpdateEvent{Final: false, Artifact: Artifact{LastChunk: false}},
 			expected: false,
 		},
 		{
 			name:     "ArtifactUpdate Last Chunk",
-			event:    TaskArtifactUpdateEvent{Final: true, Artifact: Artifact{LastChunk: boolPtr(true)}},
+			event:    TaskArtifactUpdateEvent{Final: true, Artifact: Artifact{LastChunk: true}},
 			expected: true,
 		},
 	}
@@ -157,9 +152,9 @@ func TestMessageJSON(t *testing.T) {
 	filePart := FilePart{
 		Type: PartTypeFile,
 		File: FileContent{
-			Name:     stringPtr("example.txt"),
-			MimeType: stringPtr("text/plain"),
-			Bytes:    stringPtr("RmlsZSBjb250ZW50"), // Base64 encoded "File content"
+			Name:     "example.txt",
+			MimeType: "text/plain",
+			Bytes:    "RmlsZSBjb250ZW50", // Base64 encoded "File content"
 		},
 	}
 
@@ -191,9 +186,9 @@ func TestMessageJSON(t *testing.T) {
 	filePartDecoded, ok := decoded.Parts[1].(FilePart)
 	require.True(t, ok, "Second part should be a FilePart")
 	assert.Equal(t, PartTypeFile, filePartDecoded.Type)
-	assert.Equal(t, "example.txt", *filePartDecoded.File.Name)
-	assert.Equal(t, "text/plain", *filePartDecoded.File.MimeType)
-	assert.Equal(t, "RmlsZSBjb250ZW50", *filePartDecoded.File.Bytes)
+	assert.Equal(t, "example.txt", filePartDecoded.File.Name)
+	assert.Equal(t, "text/plain", filePartDecoded.File.MimeType)
+	assert.Equal(t, "RmlsZSBjb250ZW50", filePartDecoded.File.Bytes)
 }
 
 // TestPartValidation tests validation of different part types
@@ -219,9 +214,9 @@ func TestPartValidation(t *testing.T) {
 		validFilePart := FilePart{
 			Type: PartTypeFile,
 			File: FileContent{
-				Name:     stringPtr("file.txt"),
-				MimeType: stringPtr("text/plain"),
-				Bytes:    stringPtr("SGVsbG8="), // Base64 "Hello"
+				Name:     "file.txt",
+				MimeType: "text/plain",
+				Bytes:    "SGVsbG8=", // Base64 "Hello"
 			},
 		}
 		assert.True(t, isValidPart(validFilePart))
@@ -258,7 +253,7 @@ func isValidPart(part Part) bool {
 	case TextPart:
 		return p.Type == PartTypeText && p.Text != ""
 	case FilePart:
-		return p.Type == PartTypeFile && (p.File.Name != nil || p.File.URI != nil || p.File.Bytes != nil)
+		return p.Type == PartTypeFile && (p.File.Name != "" || p.File.URI != "" || p.File.Bytes != "")
 	case DataPart:
 		return p.Type == PartTypeData && p.Data != nil
 	default:
@@ -276,22 +271,22 @@ func TestArtifact(t *testing.T) {
 
 	// Create an artifact
 	artifact := Artifact{
-		Name:        stringPtr("Test Artifact"),
-		Description: stringPtr("This is a test artifact"),
+		Name:        "Test Artifact",
+		Description: "This is a test artifact",
 		Parts:       []Part{textPart},
 		Index:       1,
-		LastChunk:   boolPtr(true),
+		LastChunk:   true,
 	}
 
 	// Validate the artifact
 	assert.NotNil(t, artifact.Name)
-	assert.Equal(t, "Test Artifact", *artifact.Name)
+	assert.Equal(t, "Test Artifact", artifact.Name)
 	assert.NotNil(t, artifact.Description)
-	assert.Equal(t, "This is a test artifact", *artifact.Description)
+	assert.Equal(t, "This is a test artifact", artifact.Description)
 	assert.Len(t, artifact.Parts, 1)
 	assert.Equal(t, 1, artifact.Index)
 	assert.NotNil(t, artifact.LastChunk)
-	assert.True(t, *artifact.LastChunk)
+	assert.True(t, artifact.LastChunk)
 
 	// Test JSON marshaling
 	data, err := json.Marshal(artifact)
@@ -303,10 +298,10 @@ func TestArtifact(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verify the decoded artifact
-	assert.Equal(t, *artifact.Name, *decoded.Name)
-	assert.Equal(t, *artifact.Description, *decoded.Description)
+	assert.Equal(t, artifact.Name, decoded.Name)
+	assert.Equal(t, artifact.Description, decoded.Description)
 	assert.Equal(t, artifact.Index, decoded.Index)
-	assert.Equal(t, *artifact.LastChunk, *decoded.LastChunk)
+	assert.Equal(t, artifact.LastChunk, decoded.LastChunk)
 
 	// Check the part
 	require.Len(t, decoded.Parts, 1)
@@ -343,11 +338,6 @@ func TestTaskStatus(t *testing.T) {
 	assert.Equal(t, MessageRoleAgent, status.Message.Role)
 }
 
-// Helper functions for testing
-func stringPtr(s string) *string {
-	return &s
-}
-
 // TestMarkerFunctions tests the marker functions for parts and events
 func TestMarkerFunctions(t *testing.T) {
 	// Test part marker functions
@@ -377,7 +367,7 @@ func TestMarkerFunctions(t *testing.T) {
 func TestNewTask(t *testing.T) {
 	// Test with just ID
 	taskID := "test-task"
-	task := NewTask(taskID, nil)
+	task := NewTask(taskID, "")
 
 	assert.Equal(t, taskID, task.ID)
 	assert.Nil(t, task.SessionID)
@@ -389,9 +379,9 @@ func TestNewTask(t *testing.T) {
 
 	// Test with session ID
 	sessionID := "test-session"
-	task = NewTask(taskID, &sessionID)
+	task = NewTask(taskID, sessionID)
 
 	assert.Equal(t, taskID, task.ID)
-	assert.Equal(t, &sessionID, task.SessionID)
-	assert.Equal(t, *task.SessionID, sessionID)
+	assert.Equal(t, sessionID, task.SessionID)
+	assert.Equal(t, task.SessionID, sessionID)
 }

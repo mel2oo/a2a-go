@@ -22,9 +22,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"trpc.group/trpc-go/trpc-a2a-go/client"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/server"
+	"github.com/mel2oo/a2a-go/client"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/server"
 )
 
 // Config holds the application configuration.
@@ -151,8 +151,8 @@ func fetchAgentCard(baseURL string) (*server.AgentCard, error) {
 func displayAgentCapabilities(card *server.AgentCard) {
 	fmt.Println("Agent Capabilities:")
 	fmt.Printf("  Name: %s\n", card.Name)
-	if card.Description != nil {
-		fmt.Printf("  Description: %s\n", *card.Description)
+	if card.Description != "" {
+		fmt.Printf("  Description: %s\n", card.Description)
 	}
 	fmt.Printf("  Version: %s\n", card.Version)
 
@@ -175,8 +175,8 @@ func displayAgentCapabilities(card *server.AgentCard) {
 		fmt.Println("  Skills:")
 		for _, skill := range card.Skills {
 			fmt.Printf("    - %s: ", skill.Name)
-			if skill.Description != nil {
-				fmt.Printf("%s\n", *skill.Description)
+			if skill.Description != "" {
+				fmt.Printf("%s\n", skill.Description)
 			} else {
 				fmt.Println("(no description)")
 			}
@@ -515,7 +515,7 @@ func createTaskParams(taskID, sessionID, input string, historyLength int) protoc
 
 	params := protocol.SendTaskParams{
 		ID:        taskID,
-		SessionID: &sessionID,
+		SessionID: sessionID,
 		Message:   message,
 	}
 
@@ -537,7 +537,7 @@ func handleStreamingInteraction(
 	ctx, cancel := context.WithTimeout(context.Background(), config.Timeout*2)
 	defer cancel()
 
-	log.Printf("Sending stream request for task %s (Session: %s)...", taskID, *params.SessionID)
+	log.Printf("Sending stream request for task %s (Session: %s)...", taskID, params.SessionID)
 	eventChan, streamErr := a2aClient.StreamTask(ctx, params)
 
 	if streamErr != nil {
@@ -569,7 +569,7 @@ func handleStandardInteraction(
 	ctx, cancel := context.WithTimeout(context.Background(), config.Timeout)
 	defer cancel()
 
-	log.Printf("Sending standard request for task %s (Session: %s)...", taskID, *params.SessionID)
+	log.Printf("Sending standard request for task %s (Session: %s)...", taskID, params.SessionID)
 
 	// Send the task
 	task, err := a2aClient.SendTasks(ctx, params)
@@ -598,8 +598,8 @@ func handleStandardInteraction(
 		fmt.Println("  Artifacts:")
 		for i, artifact := range task.Artifacts {
 			name := fmt.Sprintf("Artifact #%d", i+1)
-			if artifact.Name != nil {
-				name = *artifact.Name
+			if artifact.Name != "" {
+				name = artifact.Name
 			}
 			fmt.Printf("    [%s]\n", name)
 			printParts(artifact.Parts)
@@ -607,7 +607,7 @@ func handleStandardInteraction(
 	}
 
 	// Display history if present
-	if task.History != nil && len(task.History) > 0 {
+	if len(task.History) > 0 {
 		fmt.Println("  History:")
 		for i, msg := range task.History {
 			role := "User"
@@ -689,7 +689,7 @@ func processStreamResponse(
 				name := getArtifactName(e.Artifact)
 
 				// Show if this is an append operation
-				if e.Artifact.Append != nil && *e.Artifact.Append {
+				if e.Artifact.Append {
 					fmt.Printf("  [Artifact Update: %s (Appending)]\n", name)
 				} else {
 					fmt.Printf("  [Artifact Update: %s]\n", name)
@@ -699,7 +699,7 @@ func processStreamResponse(
 				printParts(e.Artifact.Parts)
 
 				// Handle artifact storage for return value
-				if e.Artifact.Append != nil && *e.Artifact.Append && len(finalArtifacts) > 0 {
+				if e.Artifact.Append && len(finalArtifacts) > 0 {
 					// Find existing artifact with same index to append to
 					for i, art := range finalArtifacts {
 						if art.Index == e.Artifact.Index {
@@ -708,13 +708,13 @@ func processStreamResponse(
 							finalArtifacts[i].Parts = combinedParts
 
 							// Update other fields if needed
-							if e.Artifact.Name != nil {
+							if e.Artifact.Name != "" {
 								finalArtifacts[i].Name = e.Artifact.Name
 							}
-							if e.Artifact.Description != nil {
+							if e.Artifact.Description != "" {
 								finalArtifacts[i].Description = e.Artifact.Description
 							}
-							if e.Artifact.LastChunk != nil {
+							if e.Artifact.LastChunk {
 								finalArtifacts[i].LastChunk = e.Artifact.LastChunk
 							}
 
@@ -741,8 +741,8 @@ func processStreamResponse(
 
 // getArtifactName returns the name of an artifact or a default if name is nil
 func getArtifactName(artifact protocol.Artifact) string {
-	if artifact.Name != nil {
-		return *artifact.Name
+	if artifact.Name != "" {
+		return artifact.Name
 	}
 	return fmt.Sprintf("Artifact #%d", artifact.Index+1)
 }
@@ -845,15 +845,15 @@ func displayFinalTaskState(task *protocol.Task) {
 		fmt.Println("  Artifacts:")
 		for i, artifact := range task.Artifacts {
 			name := fmt.Sprintf("Artifact #%d", i+1)
-			if artifact.Name != nil {
-				name = *artifact.Name
+			if artifact.Name != "" {
+				name = artifact.Name
 			}
 			fmt.Printf("    [%s]\n", name)
 			printParts(artifact.Parts)
 		}
 	}
 
-	if task.History != nil && len(task.History) > 0 {
+	if len(task.History) > 0 {
 		fmt.Println("  History:")
 		for i, msg := range task.History {
 			role := "User"
@@ -901,19 +901,19 @@ func printPart(part interface{}) {
 // printFilePart prints a file part.
 func printFilePart(p protocol.FilePart, indent string) {
 	name := "(unnamed file)"
-	if p.File.Name != nil {
-		name = *p.File.Name
+	if p.File.Name != "" {
+		name = p.File.Name
 	}
 	mime := "(unknown type)"
-	if p.File.MimeType != nil {
-		mime = *p.File.MimeType
+	if p.File.MimeType != "" {
+		mime = p.File.MimeType
 	}
 	fmt.Printf("%s[File: %s (%s)]\n", indent, name, mime)
-	if p.File.URI != nil {
-		fmt.Printf("%s  URI: %s\n", indent, *p.File.URI)
+	if p.File.URI != "" {
+		fmt.Printf("%s  URI: %s\n", indent, p.File.URI)
 	}
-	if p.File.Bytes != nil {
-		fmt.Printf("%s  Bytes: %d bytes\n", indent, len(*p.File.Bytes))
+	if p.File.Bytes != "" {
+		fmt.Printf("%s  Bytes: %d bytes\n", indent, len(p.File.Bytes))
 	}
 }
 
@@ -1191,8 +1191,8 @@ func getPushNotification(a2aClient *client.A2AClient, taskID string, timeout tim
 		if len(auth.Schemes) > 0 {
 			fmt.Printf("  Authentication Schemes: %v\n", auth.Schemes)
 		}
-		if auth.Credentials != nil {
-			fmt.Printf("  Credentials: %s\n", *auth.Credentials)
+		if auth.Credentials != "" {
+			fmt.Printf("  Credentials: %s\n", auth.Credentials)
 		}
 	}
 

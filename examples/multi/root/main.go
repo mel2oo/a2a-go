@@ -7,13 +7,13 @@ import (
 	"os"
 	"strings"
 
+	"github.com/mel2oo/a2a-go/client"
+	"github.com/mel2oo/a2a-go/log"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/server"
+	"github.com/mel2oo/a2a-go/taskmanager"
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/googleai"
-	"trpc.group/trpc-go/trpc-a2a-go/client"
-	"trpc.group/trpc-go/trpc-a2a-go/log"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/server"
-	"trpc.group/trpc-go/trpc-a2a-go/taskmanager"
 )
 
 // rootAgentProcessor implements the taskmanager.TaskProcessor interface.
@@ -243,7 +243,7 @@ func extractText(message protocol.Message) string {
 func getAgentCard() server.AgentCard {
 	return server.AgentCard{
 		Name:        "Multi-Agent Router",
-		Description: stringPtr("An agent that routes tasks to appropriate subagents."),
+		Description: "An agent that routes tasks to appropriate subagents.",
 		URL:         "http://localhost:8080",
 		Version:     "1.0.0",
 		Capabilities: server.AgentCapabilities{
@@ -255,7 +255,7 @@ func getAgentCard() server.AgentCard {
 			{
 				ID:          "route",
 				Name:        "Task Routing",
-				Description: stringPtr("Routes tasks to the appropriate specialized agent."),
+				Description: "Routes tasks to the appropriate specialized agent.",
 				Examples: []string{
 					"Write a poem about autumn",
 					"What's the exchange rate from USD to EUR?",
@@ -264,11 +264,6 @@ func getAgentCard() server.AgentCard {
 			},
 		},
 	}
-}
-
-// stringPtr is a helper function to get a pointer to a string.
-func stringPtr(s string) *string {
-	return &s
 }
 
 func main() {

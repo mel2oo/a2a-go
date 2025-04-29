@@ -19,11 +19,11 @@ import (
 	"strings"
 	"time"
 
-	"trpc.group/trpc-go/trpc-a2a-go/auth"
-	"trpc.group/trpc-go/trpc-a2a-go/internal/jsonrpc"
-	"trpc.group/trpc-go/trpc-a2a-go/internal/sse"
-	"trpc.group/trpc-go/trpc-a2a-go/log"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/auth"
+	"github.com/mel2oo/a2a-go/internal/jsonrpc"
+	"github.com/mel2oo/a2a-go/internal/sse"
+	"github.com/mel2oo/a2a-go/log"
+	"github.com/mel2oo/a2a-go/protocol"
 )
 
 const (

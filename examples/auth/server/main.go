@@ -22,10 +22,10 @@ import (
 	"syscall"
 	"time"
 
-	"trpc.group/trpc-go/trpc-a2a-go/auth"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/server"
-	"trpc.group/trpc-go/trpc-a2a-go/taskmanager"
+	"github.com/mel2oo/a2a-go/auth"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/server"
+	"github.com/mel2oo/a2a-go/taskmanager"
 )
 
 // config holds server configuration
@@ -113,7 +113,7 @@ func main() {
 
 	agentCard := server.AgentCard{
 		Name:        "A2A Server with Authentication",
-		Description: addressableStr("A demonstration server with JWT and API key authentication"),
+		Description: "A demonstration server with JWT and API key authentication",
 		URL:         fmt.Sprintf("http://localhost:%d", config.Port),
 		Provider: &server.AgentProvider{
 			Organization: "Example Provider",
@@ -125,7 +125,7 @@ func main() {
 		},
 		Authentication: &protocol.AuthenticationInfo{
 			Schemes:     []string{authType},
-			Credentials: &config.APIKeyHeader,
+			Credentials: config.APIKeyHeader,
 		},
 		DefaultInputModes:  []string{"text"},
 		DefaultOutputModes: []string{"text"},
@@ -327,10 +327,6 @@ func (p *echoProcessor) Process(
 	}
 
 	return nil
-}
-
-func addressableStr(s string) *string {
-	return &s
 }
 
 // mockOAuthServer implements a simple OAuth2 server for demonstration purposes.

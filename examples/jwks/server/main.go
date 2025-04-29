@@ -21,11 +21,11 @@ import (
 	"fmt"
 	"time"
 
-	"trpc.group/trpc-go/trpc-a2a-go/auth"
-	"trpc.group/trpc-go/trpc-a2a-go/log"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/server"
-	"trpc.group/trpc-go/trpc-a2a-go/taskmanager"
+	"github.com/mel2oo/a2a-go/auth"
+	"github.com/mel2oo/a2a-go/log"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/server"
+	"github.com/mel2oo/a2a-go/taskmanager"
 )
 
 const (
@@ -181,7 +181,7 @@ func main() {
 	// Create agent card
 	agentCard := server.AgentCard{
 		Name:        "Push Notification Example",
-		Description: strPtr("A2A server example with push notification support"),
+		Description: "A2A server example with push notification support",
 		URL:         fmt.Sprintf("http://localhost:%d/", *port),
 		Version:     "1.0.0",
 		Capabilities: server.AgentCapabilities{
@@ -235,9 +235,4 @@ func main() {
 	if err := a2aServer.Start(fmt.Sprintf(":%d", *port)); err != nil {
 		log.Fatalf("Failed to start A2A server: %v", err)
 	}
-}
-
-// Helper function to create string pointer
-func strPtr(s string) *string {
-	return &s
 }

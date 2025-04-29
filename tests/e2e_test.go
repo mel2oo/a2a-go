@@ -18,26 +18,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"trpc.group/trpc-go/trpc-a2a-go/client"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/server"
-	"trpc.group/trpc-go/trpc-a2a-go/taskmanager"
+	"github.com/mel2oo/a2a-go/client"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/server"
+	"github.com/mel2oo/a2a-go/taskmanager"
 )
-
-// stringPtr is a helper to get a pointer to a string.
-func stringPtr(s string) *string {
-	return &s
-}
-
-// boolPtr is a helper to get a pointer to a boolean.
-func boolPtr(b bool) *bool {
-	return &b
-}
-
-// intPtr is a helper to get a pointer to an int.
-func intPtr(i int) *int {
-	return &i
-}
 
 // testReverseString is a helper that reverses a string.
 func testReverseString(s string) string {
@@ -110,13 +95,13 @@ func (p *testStreamingProcessor) Process(
 
 	// Send the final artifact containing the full reversed text.
 	finalArtifact := protocol.Artifact{
-		Name:        stringPtr("Processed Text"),
-		Description: stringPtr("The reversed input text."),
+		Name:        "Processed Text",
+		Description: "The reversed input text.",
 		Parts: []protocol.Part{
 			protocol.NewTextPart(reversedText), // Returns TextPart
 		},
 		Index:     0,
-		LastChunk: boolPtr(true),
+		LastChunk: true,
 	}
 	if err := handle.AddArtifact(finalArtifact); err != nil {
 		log.Printf("[testStreamingProcessor] Error sending artifact: %v", err)
@@ -346,7 +331,7 @@ func createDefaultTestAgentCard() server.AgentCard {
 	desc := "A test agent for E2E tests"
 	return server.AgentCard{
 		Name:        "Test Agent",
-		Description: &desc,
+		Description: desc,
 		Capabilities: server.AgentCapabilities{
 			Streaming:              true,
 			StateTransitionHistory: true,

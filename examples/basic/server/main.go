@@ -22,9 +22,9 @@ import (
 	"syscall"
 	"time"
 
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
-	"trpc.group/trpc-go/trpc-a2a-go/server"
-	"trpc.group/trpc-go/trpc-a2a-go/taskmanager"
+	"github.com/mel2oo/a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/server"
+	"github.com/mel2oo/a2a-go/taskmanager"
 )
 
 // Command modes for the text processor
@@ -167,11 +167,11 @@ func (p *basicTaskProcessor) handleMultiTurnSession(
 
 		// Add the artifact
 		artifact := protocol.Artifact{
-			Name:        stringPtr("Processed Text"),
-			Description: stringPtr(fmt.Sprintf("Text processed with mode: %s", session.mode)),
+			Name:        "Processed Text",
+			Description: fmt.Sprintf("Text processed with mode: %s", session.mode),
 			Index:       0,
 			Parts:       []protocol.Part{protocol.NewTextPart(result)},
-			LastChunk:   boolPtr(true),
+			LastChunk:   true,
 		}
 
 		if err := handle.AddArtifact(artifact); err != nil {
@@ -308,11 +308,11 @@ func (p *basicTaskProcessor) processWithStreaming(
 
 	// First chunk
 	artifact1 := protocol.Artifact{
-		Name:        stringPtr("Processed Text (Part 1)"),
-		Description: stringPtr("First part of the processed text"),
+		Name:        "Processed Text (Part 1)",
+		Description: "First part of the processed text",
 		Index:       0,
 		Parts:       []protocol.Part{protocol.NewTextPart(result[:splitIndex])},
-		LastChunk:   boolPtr(false),
+		LastChunk:   false,
 	}
 
 	if err := handle.AddArtifact(artifact1); err != nil {
@@ -324,12 +324,12 @@ func (p *basicTaskProcessor) processWithStreaming(
 
 	// Second chunk (appends to first)
 	artifact2 := protocol.Artifact{
-		Name:        stringPtr("Processed Text (Complete)"),
-		Description: stringPtr("Complete processed text"),
+		Name:        "Processed Text (Complete)",
+		Description: "Complete processed text",
 		Index:       0, // Same index as first chunk
-		Append:      boolPtr(true),
+		Append:      true,
 		Parts:       []protocol.Part{protocol.NewTextPart(result[splitIndex:])},
-		LastChunk:   boolPtr(true),
+		LastChunk:   true,
 	}
 
 	if err := handle.AddArtifact(artifact2); err != nil {
@@ -400,11 +400,11 @@ func (p *basicTaskProcessor) processDirectly(
 
 	// Add artifact
 	artifact := protocol.Artifact{
-		Name:        stringPtr("Processed Text"),
-		Description: stringPtr(fmt.Sprintf("Text processed with mode: %s", command)),
+		Name:        "Processed Text",
+		Description: fmt.Sprintf("Text processed with mode: %s", command),
 		Index:       0,
 		Parts:       []protocol.Part{protocol.NewTextPart(result)},
-		LastChunk:   boolPtr(true),
+		LastChunk:   true,
 	}
 
 	if err := handle.AddArtifact(artifact); err != nil {
@@ -494,7 +494,7 @@ func main() {
 	// Create the agent card using types from the server package
 	agentCard := server.AgentCard{
 		Name:        "Text Processing Agent",
-		Description: stringPtr(description),
+		Description: description,
 		URL:         serverURL,
 		Version:     "2.0.0", // Updated version
 		Provider: &server.AgentProvider{
@@ -512,7 +512,7 @@ func main() {
 			{
 				ID:          "text_processor_reverse",
 				Name:        "Text Reverser",
-				Description: stringPtr("Input: reverse hello\nOutput: Reversed: olleh"),
+				Description: "Input: reverse hello\nOutput: Reversed: olleh",
 				Tags:        []string{"text", "reverse"},
 				Examples:    []string{"reverse hello world", "reverse The quick brown fox"},
 				InputModes:  []string{string(protocol.PartTypeText)},
@@ -521,7 +521,7 @@ func main() {
 			{
 				ID:          "text_processor_uppercase",
 				Name:        "Uppercase Converter",
-				Description: stringPtr("Input: uppercase hello world\nOutput: HELLO WORLD"),
+				Description: "Input: uppercase hello world\nOutput: HELLO WORLD",
 				Tags:        []string{"text", "uppercase"},
 				Examples:    []string{"uppercase hello world", "uppercase Example text"},
 				InputModes:  []string{string(protocol.PartTypeText)},
@@ -530,7 +530,7 @@ func main() {
 			{
 				ID:          "text_processor_lowercase",
 				Name:        "Lowercase Converter",
-				Description: stringPtr("Input: lowercase HELLO\nOutput: hello"),
+				Description: "Input: lowercase HELLO\nOutput: hello",
 				Tags:        []string{"text", "lowercase"},
 				Examples:    []string{"lowercase HELLO WORLD", "lowercase TEXT"},
 				InputModes:  []string{string(protocol.PartTypeText)},
@@ -539,7 +539,7 @@ func main() {
 			{
 				ID:          "text_processor_count",
 				Name:        "Word Counter",
-				Description: stringPtr("Input: count hello world\nOutput: Word count: 2, Character count: 11"),
+				Description: "Input: count hello world\nOutput: Word count: 2, Character count: 11",
 				Tags:        []string{"text", "count"},
 				Examples:    []string{"count The quick brown fox", "count hello world"},
 				InputModes:  []string{string(protocol.PartTypeText)},
@@ -548,7 +548,7 @@ func main() {
 			{
 				ID:          "text_processor_multi",
 				Name:        "Multi-step Process",
-				Description: stringPtr("Input: multi\nOutput: Interactive conversation requesting processing mode then text"),
+				Description: "Input: multi\nOutput: Interactive conversation requesting processing mode then text",
 				Tags:        []string{"text", "interactive"},
 				Examples:    []string{"multi"},
 				InputModes:  []string{string(protocol.PartTypeText)},
@@ -557,7 +557,7 @@ func main() {
 			{
 				ID:          "text_processor_help",
 				Name:        "Help Guide",
-				Description: stringPtr("Input: help\nOutput: List of available commands and usage"),
+				Description: "Input: help\nOutput: List of available commands and usage",
 				Tags:        []string{"help"},
 				Examples:    []string{"help"},
 				InputModes:  []string{string(protocol.PartTypeText)},
@@ -617,16 +617,6 @@ func main() {
 	}
 
 	log.Println("Server exited gracefully.")
-}
-
-// Helper function to create a string pointer
-func stringPtr(s string) *string {
-	return &s
-}
-
-// Helper function to create a boolean pointer
-func boolPtr(b bool) *bool {
-	return &b
 }
 
 // pushNotificationSender wraps a TaskManager to add webhook notification sending

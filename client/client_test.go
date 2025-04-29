@@ -19,8 +19,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"trpc.group/trpc-go/trpc-a2a-go/internal/jsonrpc"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
+	"github.com/mel2oo/a2a-go/internal/jsonrpc"
+	"github.com/mel2oo/a2a-go/protocol"
 )
 
 // TestA2AClient_SendTask tests the SendTask client method covering success,
@@ -273,7 +273,7 @@ func TestA2AClient_GetTasks(t *testing.T) {
 			Status: protocol.TaskStatus{State: protocol.TaskStateCompleted},
 			Artifacts: []protocol.Artifact{
 				{
-					Name:  stringPtr("test-artifact"),
+					Name:  "test-artifact",
 					Parts: []protocol.Part{protocol.NewTextPart("Test result")},
 				},
 			},
@@ -306,7 +306,7 @@ func TestA2AClient_GetTasks(t *testing.T) {
 		assert.Equal(t, taskID, result.ID)
 		assert.Equal(t, protocol.TaskStateCompleted, result.Status.State)
 		assert.Len(t, result.Artifacts, 1)
-		assert.Equal(t, "test-artifact", *result.Artifacts[0].Name)
+		assert.Equal(t, "test-artifact", result.Artifacts[0].Name)
 	})
 
 	t.Run("GetTasks JSON-RPC Error", func(t *testing.T) {
@@ -613,11 +613,6 @@ func TestA2AClient_GetPushNotification(t *testing.T) {
 		assert.Nil(t, result, "Result should be nil on error")
 		assert.Contains(t, err.Error(), "Not found")
 	})
-}
-
-// Helper function to get string pointer for tests
-func stringPtr(s string) *string {
-	return &s
 }
 
 // createMockServerHandler provides a configurable mock HTTP handler for testing

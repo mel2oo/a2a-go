@@ -16,10 +16,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mel2oo/a2a-go/auth"
+	"github.com/mel2oo/a2a-go/client"
+	"github.com/mel2oo/a2a-go/protocol"
 	"golang.org/x/oauth2/clientcredentials"
-	"trpc.group/trpc-go/trpc-a2a-go/auth"
-	"trpc.group/trpc-go/trpc-a2a-go/client"
-	"trpc.group/trpc-go/trpc-a2a-go/protocol"
 )
 
 // config holds the client configuration options.
@@ -91,7 +91,7 @@ func main() {
 
 	// Add session ID if provided
 	if config.SessionID != "" {
-		taskParams.SessionID = &config.SessionID
+		taskParams.SessionID = config.SessionID
 	}
 
 	// Send the task
@@ -105,8 +105,8 @@ func main() {
 	}
 
 	fmt.Printf("Task ID: %s, Status: %s\n", task.ID, task.Status.State)
-	if task.SessionID != nil {
-		fmt.Printf("Session ID: %s\n", *task.SessionID)
+	if task.SessionID != "" {
+		fmt.Printf("Session ID: %s\n", task.SessionID)
 	}
 
 	// For demonstration purposes, get the task status
